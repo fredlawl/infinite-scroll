@@ -1,0 +1,19 @@
+.scroll-container {
+    position: relative;
+}
+
+.scroll-container .isotope-item {
+    width: 300px;
+    transition: 0.4s all ease;
+    float: left;
+    margin: 0 auto;
+    overflow: visible;
+}
+
+.panel .panel-body {
+    overflow: scroll;
+}
+
+.panel-small .panel-body {
+    height: 400px;
+}
