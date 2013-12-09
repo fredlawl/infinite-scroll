@@ -116,8 +116,12 @@
                     scroller: $exampleTwo.parents('.panel-body'),
                     onBeforeLoad: function (plugin) {
                         plugin.setAjax({
-                            url: './index.html',
-                            cache: true
+                            url: './article.php',
+                            cache: false,
+                            data: {
+                                posts_per_page: 20,
+                                page: plugin.properties.iteration
+                            }
                         });
                     }
                 });
