@@ -99,8 +99,6 @@
                 }
 
             });
-
-            console.log('getWidgets called!')
         }
 
         function bindings () {
@@ -129,16 +127,16 @@
         }
 
         function init () {
-
             if (initiated === false) {
                 settings = $.extend({}, defaults, options);
+                returnOBJ = {
+                    settings: settings,
+                    properties: properties,
+                    setAjax: setAjaxObject
+                };
+
                 if ($.isFunction(settings.onInit)) {
                     settings.onInit(settings);
-                    returnOBJ = {
-                        settings: settings,
-                        properties: properties,
-                        setAjax: setAjaxObject
-                    };
                 }
 
                 if (settings.loadOnInit) {
@@ -159,7 +157,7 @@
 
     $.fn.infiniteScroll = function (options) {
         return this.each(function() {
-            if (undefined == $(this).data('infiniteScroll')) {
+            if (typeof $(this).data('infiniteScroll') === 'undefined') {
                 var plugin = new $.infiniteScroll(this, options);
                 $(this).data('infiniteScroll', plugin);
             }
