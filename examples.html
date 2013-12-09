@@ -61,15 +61,18 @@
 
                 $container.infiniteScroll({
                     threshold: 500,
-                    targetScript: './article.php',
                     scroller: $container.parents('.panel-body'),
-                    onBeforeLoad: function () {
-                        $container.infiniteScroll().setAjaxSettings({
+                    onBeforeLoad: function (plugin) {
+                        plugin.setAjax({
+                            url: './article.php',
+                            cache: false,
                             data: {
                                 posts_per_page: 6,
-                                page: $container.infiniteScroll().properties.iteration
+                                page: plugin.properties.iteration
                             }
                         });
+                        console.log('When is this called? First?');
+                        console.log(plugin);
                     },
                     onInit: function (settings) {
                         $container.isotope({
@@ -83,8 +86,6 @@
                                 overflow: 'visible'
                             }
                         });
-
-                        console.log($container);
                     },
                     insert: function ($this, $items) {
                         $this.append($items).isotope('appended', $items, function () {
@@ -93,6 +94,7 @@
                     }
                 });
 
+                console.log($container.data('infiniteScroll'));
 
             })(jQuery);
         </script>
