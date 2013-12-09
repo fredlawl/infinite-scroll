@@ -145,6 +145,17 @@
             setAjax: setAjaxObject
         };
 
+    };
+
+    $.fn.infiniteScroll = function(options) {
+        return this.each(function() {
+            // if plugin has not already been attached to the element
+            if (undefined == $(this).data('pluginName')) {
+                var plugin = new $.pluginName(this, options);
+                $(this).data('infiniteScroll', plugin);
+            }
+
+        });
     }
 
 })(jQuery);
