@@ -1,16 +1,14 @@
 (function ($) {
 
-    $.fn.infiniteScroll = function (options) {
+    $.infiniteScroll = function (element, options) {
 
-        var plugin = this,
-            $this = $(this),
+        var $this = $(element),
             $window = $(window),
             $document = $(document),
             defaults = {
                 loadOnInit: true,
                 scroller: $(window),
                 threshold: 200,
-                targetScript: null,
 
                 append: true,
                 prepend: false,
@@ -29,12 +27,8 @@
             properties = {
                 iteration: 1,
                 loading: false,
-                ajaxSettings: {
-                    url: null,
-                    cache: false
-                }
+                ajax: null
             },
-            returnplugin,
             settings;
 
         function queueData (data) {
@@ -44,14 +38,14 @@
             for (var i = 0, len = data.length; i < len; i++) {
                 piece = data[i];
 
-                if ($.isFunction(plugin.settings.beforeQueueAjaxedItem))
-                    piece = plugin.settings.beforeQueueAjaxedItem(piece);
+                if ($.isFunction(settings.beforeQueueAjaxedItem))
+                    piece = settings.beforeQueueAjaxedItem(piece);
 
                 queue.push(piece);
             }
 
-            if ($.isFunction(plugin.settings.afterItemsQueued))
-                queue = plugin.settings.afterItemsQueued(queue);
+            if ($.isFunction(settings.afterItemsQueued))
+                queue = settings.afterItemsQueued(queue);
 
             addData(queue);
         }
@@ -59,41 +53,41 @@
         function addData (queue) {
             var $widgets = $(queue.join(''));
 
-            if ($.isFunction(plugin.settings.insert)) {
-                plugin.settings.insert($this, $widgets);
-            } else if (plugin.settings.prepend) {
+            if ($.isFunction(settings.insert)) {
+                settings.insert($this, $widgets);
+            } else if (settings.prepend) {
                 $this.prepend($widgets);
-            } else if (plugin.settings.append) {
+            } else if (settings.append) {
                 $this.append($widgets);
             }
 
-            if ($.isFunction(plugin.settings.afterWidgetsInserted))
-                plugin.settings.afterWidgetsInserted();
+            if ($.isFunction(settings.afterWidgetsInserted))
+                settings.afterWidgetsInserted();
 
-            plugin.properties.loading = false;
-            plugin.properties.iteration++;
+            properties.loading = false;
+            properties.iteration++;
         }
 
         function getWidgets () {
             var request;
 
-            if (plugin.properties.loading)
+            if (properties.loading)
                 return false;
 
-            plugin.properties.loading = true;
-            if ($.isFunction(plugin.settings.onBeforeLoad))
-                plugin.settings.onBeforeLoad();
+            properties.loading = true;
+            if ($.isFunction(settings.onBeforeLoad))
+                settings.onBeforeLoad();
 
-            request = $.ajax(plugin.properties.ajaxSettings);
+            request = $.ajax(properties.ajaxSettings);
             request.done(function (data, status, xhr) {
 
                 if (status == 'success') {
-                    if ($.isFunction(plugin.settings.onSuccess)) {
-                        plugin.settings.onSuccess({
+                    if ($.isFunction(settings.onSuccess)) {
+                        settings.onSuccess({
                             data: data,
                             status: status,
                             xhr: xhr
-                        }, plugin.properties);
+                        }, properties);
                     }
 
                     queueData(data);
@@ -105,16 +99,16 @@
         }
 
         function bindings () {
-            var $scrollable = plugin.settings.scroller;
+            var $scrollable = settings.scroller;
 
             $scrollable.scroll(function(e) {
                 e.stopPropagation();
 
-                if (plugin.properties.loading)
+                if (properties.loading)
                     return false;
 
                 var offset = $this.height() - $scrollable.height();
-                offset = offset - plugin.settings.threshold;
+                offset = offset - settings.threshold;
 
                 if ($scrollable.scrollTop() >= offset) {
                     getWidgets();
@@ -125,32 +119,31 @@
 
         }
 
-        function setAjaxSettings (ajaxOptions) {
-            plugin.properties.ajaxSettings = $.extend({}, plugin.properties.ajaxSettings, ajaxOptions);
+        function setAjaxObject (ajaxOptions) {
+            properties.ajax = $.extend({}, properties.ajax, ajaxOptions);
         }
 
-        if (typeof options !== 'undefined') {
-            plugin.settings = $.extend({}, defaults, options);
-            plugin.properties = properties;
+        function init () {
+            settings = $.extend({}, defaults, options);
 
-            plugin.properties.ajaxSettings.url = plugin.settings.targetScript;
-
-            if ($.isFunction(plugin.settings.onInit)) {
-                plugin.settings.onInit(plugin.settings);
+            if ($.isFunction(settings.onInit)) {
+                settings.onInit(settings);
             }
 
-            if (plugin.settings.loadOnInit) {
+            if (settings.loadOnInit) {
                 getWidgets();
             }
 
             bindings();
         }
 
-        return {
-            settings: plugin.settings,
-            properties: $.extend({}, plugin.properties),
-            setAjaxSettings: setAjaxSettings
-        }
+        init();
+
+        return = {
+            settings: settings,
+            properties: $.extend({}, properties),
+            setAjax: setAjaxObject
+        };
 
     }
 
