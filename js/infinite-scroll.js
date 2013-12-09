@@ -3,6 +3,7 @@
     $.infiniteScroll = function (element, options) {
 
         var $this = $(element),
+            plugin = this,
             $window = $(window),
             $document = $(document),
             defaults = {
@@ -25,11 +26,15 @@
                 afterInsert: null
             },
             properties = {
-                iteration: 1,
-                loading: false,
-                ajax: null
+                iteration: 1
             },
-            settings;
+            is = {
+                loading: false
+            },
+            settings,
+            initiated = false,
+            returnOBJ,
+            ajax;
 
         function queueData (data) {
             var queue = [],
@@ -64,21 +69,21 @@
             if ($.isFunction(settings.afterWidgetsInserted))
                 settings.afterWidgetsInserted();
 
-            properties.loading = false;
+            is.loading = false;
             properties.iteration++;
         }
 
         function getWidgets () {
             var request;
 
-            if (properties.loading)
+            if (is.loading)
                 return false;
 
-            properties.loading = true;
+            is.loading = true;
             if ($.isFunction(settings.onBeforeLoad))
-                settings.onBeforeLoad();
+                settings.onBeforeLoad(returnOBJ);
 
-            request = $.ajax(properties.ajax);
+            request = $.ajax(ajax);
             request.done(function (data, status, xhr) {
 
                 if (status == 'success') {
@@ -104,7 +109,7 @@
             $scrollable.scroll(function(e) {
                 e.stopPropagation();
 
-                if (properties.loading)
+                if (is.loading)
                     return false;
 
                 var offset = $this.height() - $scrollable.height();
@@ -120,41 +125,44 @@
         }
 
         function setAjaxObject (ajaxOptions) {
-            properties.ajax = $.extend({}, properties.ajax, ajaxOptions);
+            ajax = $.extend({}, ajax, ajaxOptions);
         }
 
         function init () {
-            settings = $.extend({}, defaults, options);
 
-            if ($.isFunction(settings.onInit)) {
-                settings.onInit(settings);
+            if (initiated === false) {
+                settings = $.extend({}, defaults, options);
+                if ($.isFunction(settings.onInit)) {
+                    settings.onInit(settings);
+                    returnOBJ = {
+                        settings: settings,
+                        properties: properties,
+                        setAjax: setAjaxObject
+                    };
+                }
+
+                if (settings.loadOnInit) {
+                    getWidgets();
+                }
+
+                bindings();
+                initiated = true;
             }
 
-            if (settings.loadOnInit) {
-                getWidgets();
-            }
+            return returnOBJ;
 
-            bindings();
         }
 
-        init();
-
-        return = {
-            settings: settings,
-            properties: $.extend({}, properties),
-            setAjax: setAjaxObject
-        };
+        return init();
 
     };
 
-    $.fn.infiniteScroll = function(options) {
+    $.fn.infiniteScroll = function (options) {
         return this.each(function() {
-            // if plugin has not already been attached to the element
-            if (undefined == $(this).data('pluginName')) {
-                var plugin = new $.pluginName(this, options);
+            if (undefined == $(this).data('infiniteScroll')) {
+                var plugin = new $.infiniteScroll(this, options);
                 $(this).data('infiniteScroll', plugin);
             }
-
         });
     }
 
