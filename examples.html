@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Infinite Scroll Example</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+        <link rel="stylesheet" type="text/css" href="css/bootstrap-theme.min.css" />
+        <link rel="stylesheet" type="text/css" href="css/style.css" />
+    </head>
+    <body>
+
+        <header>
+            <nav class="navbar navbar-default" role="navigation">
+                <div class="container">
+                    <div class="navbar-header">
+                        <a class="navbar-brand" href="index.html">Infinite Scroll</a>
+                    </div>
+                    <ul class="nav navbar-nav">
+                        <li><a href="index.html">Introduction</a></li>
+                        <li><a href="examples.html">Examples</a></li>
+                        <li><a href="documentation.html">Documentation</a></li>
+                    </ul>
+                </div>
+            </nav>
+        </header>
+
+        <section class="container">
+            <div class="row">
+
+                <h1>Infinite Scroller jQuery Plugin</h1>
+                <p>Below show various uses of the plugin.</p>
+                <div class="alert alert-danger">
+                    <strong>Warning!</strong> Some examples will indeed scroll infinitely! Since there are multiple instances on the page, consider having your laptop plugged in.
+                </div>
+
+                <div class="panel panel-default panel-small">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Example 1</h3>
+                    </div>
+                    <div class="panel-body">
+
+                        <div class="scroll-container clearfix"></div>
+
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+
+        <script type="text/javascript" src="js/jQuery.1.10.2.min"></script>
+        <script type="text/javascript" src="js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="js/isotope.min.js"></script>
+        <script type="text/javascript" src="js/infinite-scroll.js"></script>
+        <script type="text/javascript">
+
+            (function ($) {
+
+                // code found on this page: http://isotope.metafizzy.co/custom-layout-modes/masonry-gutters.html
+                // modified Isotope methods for gutters in masonry
+                $.Isotope.prototype._getMasonryGutterColumns = function() {
+                    var gutter = this.options.masonry && this.options.masonry.gutterWidth || 0;
+                    containerWidth = this.element.width();
+
+                    this.masonry.columnWidth = this.options.masonry && this.options.masonry.columnWidth ||
+                    // or use the size of the first item
+                    this.$filteredAtoms.outerWidth(true) ||
+                    // if there's no items, use size of container
+                    containerWidth;
+
+                    this.masonry.columnWidth += gutter;
+
+                    this.masonry.cols = Math.floor((containerWidth + gutter) / this.masonry.columnWidth);
+                    this.masonry.cols = Math.max(this.masonry.cols, 1);
+                };
+
+                $.Isotope.prototype._masonryReset = function() {
+                    // layout-specific props
+                    this.masonry = {};
+                    // FIXME shouldn't have to call this again
+                    this._getMasonryGutterColumns();
+                    var i = this.masonry.cols;
+                    this.masonry.colYs = [];
+                    while (i--) {
+                        this.masonry.colYs.push(0);
+                    }
+                };
+
+                $.Isotope.prototype._masonryResizeChanged = function() {
+                    var prevSegments = this.masonry.cols;
+                    // update cols/rows
+                    this._getMasonryGutterColumns();
+                    // return if updated cols/rows is not equal to previous
+                    return (this.masonry.cols !== prevSegments);
+                };
+
+                var $container = $('.scroll-container');
+
+                $container.infiniteScroll({
+                    threshold: 500,
+                    targetScript: './article.php',
+                    scroller: $container.parents('.panel-body'),
+                    onBeforeLoad: function () {
+                        $container.infiniteScroll().setAjaxSettings({
+                            data: {
+                                posts_per_page: 6,
+                                page: $container.infiniteScroll().properties.iteration
+                            }
+                        });
+                    },
+                    onInit: function (settings) {
+                        $container.isotope({
+                            itemSelector : '.isotope-item',
+                            layoutMode: 'masonry',
+                            masonry: {
+                                columnWidth: 300,
+                                gutterWidth: 40
+                            },
+                            containerStyle: {
+                                overflow: 'visible'
+                            }
+                        });
+
+                        console.log($container);
+                    },
+                    insert: function ($this, $items) {
+                        $this.append($items).isotope('appended', $items, function () {
+                            $this.isotope('reLayout');
+                        });
+                    }
+                });
+
+
+            })(jQuery);
+        </script>
+    </body>
+</html>
