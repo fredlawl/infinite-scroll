@@ -1,8 +1,8 @@
-.scroll-container {
+.example {
     position: relative;
 }
 
-.scroll-container .isotope-item {
+.example .isotope-item {
     width: 300px;
     transition: 0.4s all ease;
     float: left;

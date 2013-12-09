@@ -35,11 +35,22 @@
 
                 <div class="panel panel-default panel-small">
                     <div class="panel-heading">
-                        <h3 class="panel-title">Example 1</h3>
+                        <h3 class="panel-title">Example 1 - Isotope Append</h3>
                     </div>
                     <div class="panel-body">
 
-                        <div class="scroll-container clearfix"></div>
+                        <div class="example-1 example clearfix"></div>
+
+                    </div>
+                </div>
+
+                <div class="panel panel-default panel-small">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Example 2 - Normal Append</h3>
+                    </div>
+                    <div class="panel-body">
+
+                        <div class="example-2 example clearfix"></div>
 
                     </div>
                 </div>
@@ -57,11 +68,16 @@
 
             (function ($) {
 
-                var $container = $('.scroll-container');
+                var $exampleOne = $('.example-1'),
+                    $exampleTwo = $('.example-2');
 
-                $container.infiniteScroll({
+
+                //--------------------------------------------------------------
+                //  Example 1 Code
+                //--------------------------------------------------------------
+                $exampleOne.infiniteScroll({
                     threshold: 500,
-                    scroller: $container.parents('.panel-body'),
+                    scroller: $exampleOne.parents('.panel-body'),
                     onBeforeLoad: function (plugin) {
                         plugin.setAjax({
                             url: './article.php',
@@ -71,11 +87,9 @@
                                 page: plugin.properties.iteration
                             }
                         });
-                        console.log('When is this called? First?');
-                        console.log(plugin);
                     },
                     onInit: function (settings) {
-                        $container.isotope({
+                        $exampleOne.isotope({
                             itemSelector : '.isotope-item',
                             layoutMode: 'masonry',
                             masonry: {
@@ -94,7 +108,23 @@
                     }
                 });
 
-                console.log($container.data('infiniteScroll'));
+                //--------------------------------------------------------------
+                //  Example 2 Code
+                //--------------------------------------------------------------
+                $exampleTwo.infiniteScroll({
+                    threshold: 200,
+                    scroller: $exampleTwo.parents('.panel-body'),
+                    onBeforeLoad: function (plugin) {
+                        plugin.setAjax({
+                            url: './index.html',
+                            cache: true
+                        });
+                    }
+                });
+
+                console.log('Ex. 1', $exampleOne.data());
+                console.log('Ex. 2', $exampleTwo.data());
+
 
             })(jQuery);
         </script>
