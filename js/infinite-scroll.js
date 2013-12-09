@@ -78,7 +78,7 @@
             if ($.isFunction(settings.onBeforeLoad))
                 settings.onBeforeLoad();
 
-            request = $.ajax(properties.ajaxSettings);
+            request = $.ajax(properties.ajax);
             request.done(function (data, status, xhr) {
 
                 if (status == 'success') {
