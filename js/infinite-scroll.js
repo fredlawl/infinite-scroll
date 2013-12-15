@@ -10,6 +10,7 @@
                 loadOnInit: true,
                 scroller: $(window),
                 threshold: 200,
+                timeout: 200,
 
                 append: true,
                 prepend: false,
@@ -29,7 +30,8 @@
                 iteration: 1
             },
             is = {
-                loading: false
+                loading: false,
+                allowedToScroll: true
             },
             settings,
             initiated = false,
@@ -57,7 +59,23 @@
 
         function addData (queue) {
             var $widgets = $(queue.join(''));
+            is.allowedToScroll = false;
 
+            if (settings.timeout > 0) {
+                setTimeout(function () {
+                    initiateInsertion($widgets);
+                    is.allowedToScroll = true;
+                }, settings.timeout);
+            } else {
+                initiateInsertion($widgets);
+                is.allowedToScroll = true;
+            }
+
+            is.loading = false;
+            properties.iteration++;
+        }
+
+        function initiateInsertion ($widgets) {
             if ($.isFunction(settings.insert)) {
                 settings.insert($this, $widgets);
             } else if (settings.prepend) {
@@ -68,9 +86,6 @@
 
             if ($.isFunction(settings.afterWidgetsInserted))
                 settings.afterWidgetsInserted();
-
-            is.loading = false;
-            properties.iteration++;
         }
 
         function getWidgets () {
@@ -107,7 +122,7 @@
             $scrollable.scroll(function(e) {
                 e.stopPropagation();
 
-                if (is.loading)
+                if (is.loading || !is.allowedToScroll)
                     return false;
 
                 var offset = $this.height() - $scrollable.height();
