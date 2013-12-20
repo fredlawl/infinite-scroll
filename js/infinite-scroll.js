@@ -27,24 +27,24 @@
                 afterInsert: null
             },
             properties = {
-                iteration: 1
+                iteration: 1,
+                scrollOffset: 0
             },
             is = {
-                loading: false,
                 allowedToScroll: true
             },
             settings,
             initiated = false,
             returnOBJ,
-            ajax;
+            ajax,
+
+            $scrollable;
 
         function queueData (data) {
             var queue = [],
                 piece;
 
-            for (var i = 0, len = data.length; i < len; i++) {
-                piece = data[i];
-
+            for (var i = 0, len = data.length, piece; i < len, piece = data[i]; i++) {
                 if ($.isFunction(settings.beforeQueueAjaxedItem))
                     piece = settings.beforeQueueAjaxedItem(piece);
 
@@ -59,19 +59,15 @@
 
         function addData (queue) {
             var $widgets = $(queue.join(''));
-            is.allowedToScroll = false;
 
             if (settings.timeout > 0) {
                 setTimeout(function () {
                     initiateInsertion($widgets);
-                    is.allowedToScroll = true;
                 }, settings.timeout);
             } else {
                 initiateInsertion($widgets);
-                is.allowedToScroll = true;
             }
 
-            is.loading = false;
             properties.iteration++;
         }
 
@@ -86,15 +82,18 @@
 
             if ($.isFunction(settings.afterWidgetsInserted))
                 settings.afterWidgetsInserted();
+
+            setOffset();
+            $scrollable.on('scroll.infiniteScroll', whileScrolling);
+            is.allowedToScroll = true;
         }
 
         function getWidgets () {
             var request;
 
-            if (is.loading)
-                return false;
+            is.allowedToScroll = false;
+            $window.off('scroll.infiniteScroll');
 
-            is.loading = true;
             if ($.isFunction(settings.onBeforeLoad))
                 settings.onBeforeLoad(returnOBJ);
 
@@ -117,24 +116,24 @@
         }
 
         function bindings () {
-            var $scrollable = settings.scroller;
+            $scrollable.on('scroll.infiniteScroll', whileScrolling);
+            $scrollable.on('resize.infiniteScroll', setOffset);
+        }
 
-            $scrollable.scroll(function(e) {
-                e.stopPropagation();
+        function whileScrolling (e) {
+            e.preventDefault();
 
-                if (is.loading || !is.allowedToScroll)
-                    return false;
-
-                var offset = $this.height() - $scrollable.height();
-                offset = offset - settings.threshold;
-
-                if ($scrollable.scrollTop() >= offset) {
-                    getWidgets();
-                }
-
+            if (!is.allowedToScroll)
                 return false;
-            });
 
+            if ($scrollable.scrollTop() >= properties.scrollOffset) {
+                getWidgets();
+            }
+        }
+
+        function setOffset () {
+            properties.scrollOffset = $this.height() - $scrollable.height();
+            properties.scrollOffset -= settings.threshold;
         }
 
         function setAjaxObject (ajaxOptions) {
@@ -144,6 +143,8 @@
         function init () {
             if (initiated === false) {
                 settings = $.extend({}, defaults, options);
+                $scrollable = settings.scroller;
+                setOffset();
                 returnOBJ = {
                     settings: settings,
                     properties: properties,
