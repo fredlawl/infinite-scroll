@@ -17,3 +17,15 @@
 .panel-small .panel-body {
     height: 400px;
 }
+
+div.ajax-loader-container {
+    width: 24px;
+    height: 24px;
+    margin: 0 auto;
+    display: none;
+}
+
+img.ajax-loader {
+    display: block;
+    margin: 20px;
+}
