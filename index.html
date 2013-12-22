@@ -15,11 +15,6 @@
                     <div class="navbar-header">
                         <a class="navbar-brand" href="index.html">Infinite Scroll</a>
                     </div>
-                    <ul class="nav navbar-nav">
-                        <li><a href="index.html">Introduction</a></li>
-                        <li><a href="examples.html">Examples</a></li>
-                        <li><a href="documentation.html">Documentation</a></li>
-                    </ul>
                 </div>
             </nav>
         </header>
@@ -72,9 +67,6 @@
                             }
                         });
                         $('.ajax-loader-container').show();
-                    },
-                    onAjaxSuccess: function (plugin) {
-                        console.log(plugin)
                     },
                     onInit: function (settings) {
                         $exampleOne.isotope({
