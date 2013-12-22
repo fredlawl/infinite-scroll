@@ -15,9 +15,9 @@ I setup a PHP script with the repository to generate content to be ajaxed in.
 
 Clone the repository into a PHP/Apache ready folder and run the index.html file.
 
-Uses Twitter Bootstrap
-Uses jQuery
-Uses Isotope (for example implementation)
+- Uses Twitter Bootstrap
+- Uses jQuery
+- Uses Isotope (for example implementation)
 
 Useage
 --------------------
