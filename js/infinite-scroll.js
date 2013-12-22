@@ -1,5 +1,12 @@
 (function ($) {
 
+    /**
+     * $.infiniteScroll
+     *
+     * @author Frederick Lawler
+     * @license MIT
+     */
+
     $.infiniteScroll = function (element, options) {
 
         var $this = $(element),
@@ -7,23 +14,31 @@
             $window = $(window),
             $document = $(document),
             defaults = {
+                // Make first ajax call on plugin intialization
                 loadOnInit: true,
+
+                // Element that contains the view
                 scroller: $(window),
+
+                // Pixels from bottom of "scroller" to insert widgets
                 threshold: 200,
+
+                // Delay from ajax call to insert widgets
                 timeout: 200,
 
-                append: true,
-                prepend: false,
+                // Callback function to define custom insert function
                 insert: null,
 
+                // Callback function during the plugin initation process
                 onInit: null,
 
-                onBeforeLoad: null,
-                onSuccess: null,    // Called on jQuery.ajax.done
+                // Callback before the ajax function makes a request to server
+                beforeAjax: null,
 
-                beforeQueueAjaxedItem: null,
-                afterItemsQueued: null,
+                // Callback if ajax status == 'success'
+                onAjaxSuccess: null,
 
+                // Callback after widgets have been inserted into DOM
                 afterInsert: null
             },
             properties = {
@@ -40,25 +55,15 @@
 
             $scrollable;
 
-        function queueData (data) {
-            var queue = [],
-                piece;
 
-            for (var i = 0, len = data.length, piece; i < len, piece = data[i]; i++) {
-                if ($.isFunction(settings.beforeQueueAjaxedItem))
-                    piece = settings.beforeQueueAjaxedItem(piece);
+        /**
+         * addData
+         * Takes the response from ajax and preps it for insertion. Calls
+         * initiateInsertion function.
+         */
 
-                queue.push(piece);
-            }
-
-            if ($.isFunction(settings.afterItemsQueued))
-                queue = settings.afterItemsQueued(queue);
-
-            addData(queue);
-        }
-
-        function addData (queue) {
-            var $widgets = $(queue.join(''));
+        function addData (data) {
+            var $widgets = $(data);
 
             if (settings.timeout > 0) {
                 setTimeout(function () {
@@ -71,22 +76,35 @@
             properties.iteration++;
         }
 
+
+        /**
+         * initiateInsertion
+         * Inserts the widgets into the view
+         */
+
         function initiateInsertion ($widgets) {
+
             if ($.isFunction(settings.insert)) {
                 settings.insert($this, $widgets);
-            } else if (settings.prepend) {
-                $this.prepend($widgets);
-            } else if (settings.append) {
+            } else {
                 $this.append($widgets);
             }
 
-            if ($.isFunction(settings.afterWidgetsInserted))
-                settings.afterWidgetsInserted();
+            if ($.isFunction(settings.afterInsert))
+                settings.afterInsert();
 
             setOffset();
             $scrollable.on('scroll.infiniteScroll', whileScrolling);
             is.allowedToScroll = true;
         }
+
+
+        /**
+         * getWidgets
+         * Makes ajax request to pull in widgets
+         *
+         * @precondition setAjax needs to be defined for ajax to work.
+         */
 
         function getWidgets () {
             var request;
@@ -94,35 +112,45 @@
             is.allowedToScroll = false;
             $window.off('scroll.infiniteScroll');
 
-            if ($.isFunction(settings.onBeforeLoad))
-                settings.onBeforeLoad(returnOBJ);
+            if ($.isFunction(settings.beforeAjax))
+                settings.beforeAjax(returnOBJ);
+
+            if (typeof ajax === 'undefined')
+                throw new Error('Please define ajax by calling "setAjax()"');
 
             request = $.ajax(ajax);
             request.done(function (data, status, xhr) {
-
                 if (status == 'success') {
-                    if ($.isFunction(settings.onSuccess)) {
-                        settings.onSuccess({
-                            data: data,
-                            status: status,
-                            xhr: xhr
-                        }, properties);
+                    if ($.isFunction(settings.onAjaxSuccess)) {
+                        settings.onAjaxSuccess(returnOBJ);
                     }
 
-                    queueData(data);
+                    addData(data);
                 }
-
             });
         }
+
+
+        /**
+         * bindings
+         * Called during init to set the bindings
+         */
 
         function bindings () {
             $scrollable.on('scroll.infiniteScroll', whileScrolling);
             $scrollable.on('resize.infiniteScroll', setOffset);
         }
 
-        function whileScrolling (e) {
-            e.preventDefault();
 
+        /**
+         * whileScrolling
+         * Called when the $.scroll event is fired.
+         *
+         * @param Event e
+         * @return Boolean false if scroll is not allowed
+         */
+
+        function whileScrolling (e) {
             if (!is.allowedToScroll)
                 return false;
 
@@ -131,20 +159,39 @@
             }
         }
 
+
+        /**
+         * setOffset
+         */
+
         function setOffset () {
             properties.scrollOffset = $this.height() - $scrollable.height();
             properties.scrollOffset -= settings.threshold;
         }
 
+
+        /**
+         * setAjaxObject
+         *
+         * @param Plain Object ajaxOptions
+         */
+
         function setAjaxObject (ajaxOptions) {
-            ajax = $.extend({}, ajax, ajaxOptions);
+            ajax = ajaxOptions;
         }
+
+
+        /**
+         * init
+         * Initates plugin
+         */
 
         function init () {
             if (initiated === false) {
                 settings = $.extend({}, defaults, options);
                 $scrollable = settings.scroller;
                 setOffset();
+
                 returnOBJ = {
                     settings: settings,
                     properties: properties,
@@ -180,4 +227,4 @@
         });
     }
 
-})(jQuery);
+})(jQuery || Zepto);

@@ -33,34 +33,14 @@
                     <strong>Warning!</strong> Some examples will indeed scroll infinitely! Since there are multiple instances on the page, consider having your laptop plugged in.
                 </div>
 
-                <div class="panel panel-default panel-small">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Example 1 - Isotope Append</h3>
+                <div class="span12">
+
+                    <div class="example-1 example clearfix"></div>
+
+                    <div class="ajax-loader-container">
+                        <img class="ajax-loader" src="img/loadinfo.net.gif" width="24" height="24" />
                     </div>
-                    <div class="panel-body">
 
-                        <div class="example-1 example clearfix"></div>
-
-                        <div class="ajax-loader-container">
-                            <img class="ajax-loader" src="img/loadinfo.net.gif" width="24" height="24" />
-                        </div>
-
-                    </div>
-                </div>
-
-                <div class="panel panel-default panel-small">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Example 2 - Normal Append</h3>
-                    </div>
-                    <div class="panel-body">
-
-                        <div class="example-2 example clearfix"></div>
-
-                        <div class="ajax-loader-container">
-                            <img class="ajax-loader" src="img/loadinfo.net.gif" width="24" height="24" />
-                        </div>
-
-                    </div>
                 </div>
 
             </div>
@@ -76,18 +56,13 @@
 
             (function ($) {
 
-                var $exampleOne = $('.example-1'),
-                    $exampleTwo = $('.example-2');
+                var $exampleOne = $('.example-1');
 
-
-                //--------------------------------------------------------------
-                //  Example 1 Code
-                //--------------------------------------------------------------
                 $exampleOne.infiniteScroll({
                     threshold: 500,
-                    timeout: 5000,
-                    scroller: $exampleOne.parents('.panel-body'),
-                    onBeforeLoad: function (plugin) {
+                    timeout: 800,
+                    scroller: $(window),
+                    beforeAjax: function (plugin) {
                         plugin.setAjax({
                             url: './article.php',
                             cache: false,
@@ -97,6 +72,9 @@
                             }
                         });
                         $('.ajax-loader-container').show();
+                    },
+                    onAjaxSuccess: function (plugin) {
+                        console.log(plugin)
                     },
                     onInit: function (settings) {
                         $exampleOne.isotope({
@@ -118,29 +96,6 @@
                         });
                     }
                 });
-
-                //--------------------------------------------------------------
-                //  Example 2 Code
-                //--------------------------------------------------------------
-                $exampleTwo.infiniteScroll({
-                    threshold: 200,
-                    timeout: 1000,
-                    scroller: $exampleTwo.parents('.panel-body'),
-                    onBeforeLoad: function (plugin) {
-                        plugin.setAjax({
-                            url: './article.php',
-                            cache: false,
-                            data: {
-                                posts_per_page: 20,
-                                page: plugin.properties.iteration
-                            }
-                        });
-                    }
-                });
-
-                console.log('Ex. 1', $exampleOne.data());
-                console.log('Ex. 2', $exampleTwo.data());
-
 
             })(jQuery);
         </script>
