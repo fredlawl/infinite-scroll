@@ -42,6 +42,14 @@ $('.content-container').infiniteScroll({
 
 Is all that is needed to get your content to scroll!
 
+###ZeptoJS Quirks
+In order for the plugin to work with ZeptoJS, the following Zepto modules are
+needed:
+
+- [callbacks](https://github.com/madrobby/zepto/blob/master/src/callbacks.js#files)
+- [deferred](https://github.com/madrobby/zepto/blob/master/src/deferred.js#files)
+- [data](https://github.com/madrobby/zepto/blob/master/src/data.js#files)
+
 
 MIT License
 --------------------
