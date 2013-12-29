@@ -49,7 +49,6 @@
                 allowedToScroll: true
             },
             settings,
-            initiated = false,
             returnOBJ,
             ajax,
 
@@ -186,36 +185,35 @@
          * Initates plugin
          */
 
-        function init () {
-            if (initiated === false) {
-                settings = $.extend({}, defaults, options);
-                $scrollable = settings.scroller;
-                setOffset();
+        var init = function () {
 
-                returnOBJ = {
-                    settings: settings,
-                    properties: properties,
-                    setAjax: setAjaxObject
-                };
+            settings = $.extend({}, defaults, options);
+            $scrollable = settings.scroller;
+            setOffset();
 
-                if ($.isFunction(settings.onInit)) {
-                    settings.onInit(settings);
-                }
+            returnOBJ = {
+                settings: settings,
+                properties: properties,
+                setAjax: setAjaxObject
+            };
 
-                if (settings.loadOnInit) {
-                    getWidgets();
-                }
-
-                bindings();
-                initiated = true;
+            if ($.isFunction(settings.onInit)) {
+                settings.onInit(settings);
             }
 
-            return returnOBJ;
+            if (settings.loadOnInit) {
+                getWidgets();
+            }
+
+            bindings();
+
+            init = function () {
+                return returnOBJ;
+            }
 
         }
 
         return init();
-
     };
 
     $.fn.infiniteScroll = function (options) {
@@ -227,4 +225,4 @@
         });
     }
 
-})(jQuery || Zepto);
+})(window.jQuery || window.Zepto || window.$);
