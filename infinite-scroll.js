@@ -26,19 +26,39 @@
                 // Delay from ajax call to insert widgets
                 timeout: 200,
 
-                // Callback function to define custom insert function
+                /**
+                 * Use to manipulate data
+                 * @param Mixed data
+                 * @return jQuery/Zepto DOM
+                 */
+                modifyResponse: null,
+
+                /**
+                 * Callback function to define custom insert function
+                 * @param DOM Element $plugin
+                 * @param DOM Element $widgets
+                 * @return void
+                 */
                 insert: null,
 
-                // Callback function during the plugin initation process
+                /**
+                 * Callback function during the plugin initation process
+                 */
                 onInit: null,
 
-                // Callback before the ajax function makes a request to server
+                /**
+                 * Callback before the ajax function makes a request to server
+                 */
                 beforeAjax: null,
 
-                // Callback if ajax status == 'success'
+                /**
+                 * Callback if ajax status == 'success'
+                 */
                 onAjaxSuccess: null,
 
-                // Callback after widgets have been inserted into DOM
+                /**
+                 * Callback after widgets have been inserted into DOM
+                 */
                 afterInsert: null
             },
             properties = {
@@ -62,7 +82,13 @@
          */
 
         function addData (data) {
-            var $widgets = $(data);
+            var $widgets;
+
+            if ($.isFunction(settings.modifyResponse)) {
+                $widgets = settings.modifyResponse(data);
+            } else {
+                $widgets = $(data);
+            }
 
             if (settings.timeout > 0) {
                 setTimeout(function () {
