@@ -19,7 +19,7 @@ Clone the repository into a PHP/Apache ready folder and run the index.html file.
 - Uses jQuery
 - Uses Isotope (for example implementation)
 
-Useage
+Usage
 --------------------
 
 ```JavaScript
